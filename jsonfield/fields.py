@@ -25,6 +25,8 @@ class JSONFormFieldBase(object):
 
     def to_python(self, value):
         if isinstance(value, six.string_types):
+            if value == '':
+                return ''
             try:
                 return json.loads(value, **self.load_kwargs)
             except ValueError:
@@ -32,7 +34,8 @@ class JSONFormFieldBase(object):
         return value
 
     def clean(self, value):
-
+        if value == '':
+            return ''
         if not value and not self.required:
             return None
 
@@ -75,6 +78,8 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
                 # see: https://github.com/bradjasper/django-jsonfield/issues/52
                 if getattr(obj, "pk", None) is not None:
                     if isinstance(value, six.string_types):
+                        if value == '':
+                            return ''
                         try:
                             return json.loads(value, **self.load_kwargs)
                         except ValueError:
@@ -97,6 +102,8 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
         """Convert JSON object to a string"""
         if self.null and value is None:
             return None
+        if value == '':
+            return ''
         return json.dumps(value, **self.dump_kwargs)
 
     def value_to_string(self, obj):
@@ -107,6 +114,8 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
         value = super(JSONFieldBase, self).value_from_object(obj)
         if self.null and value is None:
             return None
+        if value == '':
+            return ''
         return self.dumps_for_display(value)
 
     def dumps_for_display(self, value):
